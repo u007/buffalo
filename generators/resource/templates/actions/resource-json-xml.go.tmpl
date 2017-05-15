@@ -39,7 +39,9 @@ func (v {{.camel}}Resource) List(c buffalo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.Render(200, r.{{.renderFunction}}({{.varPlural}}))
+	// Make {{.plural}} available inside the html template
+	c.Set("{{.varPlural}}", {{.varPlural}})
+	return c.Render(200, r.{{.renderFunction}}({{.varPlural}}{{.renderOptionalArgument}}))
 }
 
 // Show gets the data for one {{.model}}. This function is mapped to
@@ -54,12 +56,17 @@ func (v {{.camel}}Resource) Show(c buffalo.Context) error {
 	if err != nil {
 		return err
 	}
-	return c.Render(200, r.{{.renderFunction}}({{.varSingular}}))
+	// Make {{.varSingular}} available inside the html template
+	c.Set("{{.varSingular}}", {{.varSingular}})
+	return c.Render(200, r.{{.renderFunction}}({{.varSingular}}{{.renderOptionalArgument}}))
 }
 
-// New default implementation. Returns a 404
+// New renders the formular for creating a new {{.singular}}.
+// This function is mapped to the path GET /{{.under}}/new
 func (v {{.camel}}Resource) New(c buffalo.Context) error {
-	return c.Error(404, errors.New("not available"))
+	// Make {{.varSingular}} available inside the html template
+	c.Set("{{.varSingular}}", &models.{{.model}}{})
+	return c.Render(200, r.HTML("{{.modelPluralUnder}}/new.html"))
 }
 
 // Create adds a {{.singular}} to the DB. This function is mapped to the
@@ -81,15 +88,26 @@ func (v {{.camel}}Resource) Create(c buffalo.Context) error {
 	}
 	if verrs.HasAny() {
 		// Render errors as {{.renderFunction}}
-		return c.Render(400, r.{{.renderFunction}}(verrs))
+		return c.Render(400, r.{{.renderFunction}}(verrs{{.renderOptionalArgument}}))
 	}
 	// Success!
-	return c.Render(201, r.{{.renderFunction}}({{.varSingular}}))
+	return c.Render(201, r.{{.renderFunction}}({{.varSingular}}{{.renderOptionalArgument}}))
 }
 
-// Edit default implementation. Returns a 404
+// Edit renders a edit formular for a {{.singular}}. This function is
+// mapped to the path GET /{{.under}}/{{"{"}}{{.underSingular}}_id}/edit
 func (v {{.camel}}Resource) Edit(c buffalo.Context) error {
-	return c.Error(404, errors.New("not available"))
+	// Get the DB connection from the context
+	tx := c.Value("tx").(*pop.Connection)
+	// Allocate an empty {{.model}}
+	{{.varSingular}} := &models.{{.model}}{}
+	err := tx.Find({{.varSingular}}, c.Param("{{.underSingular}}_id"))
+	if err != nil {
+		return err
+	}
+	// Make {{.varSingular}} available inside the html template
+	c.Set("{{.varSingular}}", {{.varSingular}})
+	return c.Render(200, r.HTML("{{.modelPluralUnder}}/edit.html"))
 }
 
 // Update changes a {{.singular}} in the DB. This function is mapped to
@@ -114,10 +132,10 @@ func (v {{.camel}}Resource) Update(c buffalo.Context) error {
 	}
 	if verrs.HasAny() {
 		// Render errors as {{.renderFunction}}
-		return c.Render(400, r.{{.renderFunction}}(verrs))
+		return c.Render(400, r.{{.renderFunction}}(verrs{{.renderOptionalArgument}}))
 	}
 	// Success!
-	return c.Render(200, r.{{.renderFunction}}({{.varSingular}}))
+	return c.Render(200, r.{{.renderFunction}}({{.varSingular}}{{.renderOptionalArgument}}))
 }
 
 // Destroy deletes a {{.singular}} from the DB. This function is mapped
@@ -137,5 +155,5 @@ func (v {{.camel}}Resource) Destroy(c buffalo.Context) error {
 		return err
 	}
 	// Success!
-	return c.Render(200, r.{{.renderFunction}}({{.varSingular}}))
+	return c.Render(200, r.{{.renderFunction}}({{.varSingular}}{{.renderOptionalArgument}}))
 }

@@ -52,8 +52,8 @@ var SkipResourceModel = false
 // UseResourceModel allows to generate a resource with a working model.
 var UseResourceModel = ""
 
-// ResourceMimeType allows to generate a typed resource (HTML by default, JSON...).
-var ResourceMimeType = "html"
+// ResourceMimeType allows to generate a typed resource (auto by default, JSON, HTML...).
+var ResourceMimeType = "auto"
 
 // ResourceCmd generates a new actions/resource file and a stub test.
 var ResourceCmd = &cobra.Command{
@@ -85,31 +85,40 @@ var ResourceCmd = &cobra.Command{
 			}
 		}
 
-		if ResourceMimeType != "html" && ResourceMimeType != "json" && ResourceMimeType != "xml" {
-			return errors.New("invalid resource type, you need to choose between \"html\", \"xml\" and \"json\"")
+		if ResourceMimeType != "auto" && ResourceMimeType != "html" && ResourceMimeType != "json" && ResourceMimeType != "xml" {
+			return errors.New("invalid resource type, you need to choose between \"auto\", \"html\", \"xml\" and \"json\"")
 		}
+
+		var renderOptionalArgument string
+ 		if ResourceMimeType == "auto" {
+ 			// Auto mime type guess needs access to the request
+ 			renderOptionalArgument = ", c.Request()"
+ 		} else {
+ 			renderOptionalArgument = ""
+  		}
 
 		modelProps := getModelPropertiesFromArgs(args)
 
 		data := makr.Data{
-			"name":             name,
-			"singular":         inflect.Singularize(name),
-			"plural":           name,
-			"camel":            inflect.Camelize(name),
-			"under":            inflect.Underscore(name),
-			"underSingular":    inflect.Singularize(inflect.Underscore(name)),
-			"downFirstCap":     inflect.CamelizeDownFirst(name),
-			"model":            inflect.Singularize(inflect.Camelize(modelName)),
-			"modelPlural":      inflect.Camelize(modelName),
-			"modelUnder":       inflect.Singularize(inflect.Underscore(modelName)),
-			"modelPluralUnder": inflect.Underscore(modelName),
-			"varPlural":        inflect.CamelizeDownFirst(modelName),
-			"varSingular":      inflect.Singularize(inflect.CamelizeDownFirst(modelName)),
-			"renderFunction":   strings.ToUpper(ResourceMimeType),
-			"actions":          []string{"List", "Show", "New", "Create", "Edit", "Update", "Destroy"},
-			"args":             args,
-			"modelProps":       modelProps,
-			"modelsPath":       packagePath() + "/models",
+			"name":                   name,
+			"singular":               inflect.Singularize(name),
+			"plural":                 name,
+			"camel":                  inflect.Camelize(name),
+			"under":                  inflect.Underscore(name),
+			"underSingular":          inflect.Singularize(inflect.Underscore(name)),
+			"downFirstCap":           inflect.CamelizeDownFirst(name),
+			"model":                  inflect.Singularize(inflect.Camelize(modelName)),
+			"modelPlural":            inflect.Camelize(modelName),
+			"modelUnder":             inflect.Singularize(inflect.Underscore(modelName)),
+			"modelPluralUnder":       inflect.Underscore(modelName),
+			"varPlural":              inflect.CamelizeDownFirst(modelName),
+			"varSingular":            inflect.Singularize(inflect.CamelizeDownFirst(modelName)),
+			"renderFunction":         strings.ToUpper(ResourceMimeType),
+ 			"renderOptionalArgument": renderOptionalArgument,
+			"actions":                []string{"List", "Show", "New", "Create", "Edit", "Update", "Destroy"},
+			"args":                   args,
+			"modelProps":             modelProps,
+			"modelsPath":             packagePath() + "/models",
 
 			// Flags
 			"skipMigration": SkipResourceMigration,

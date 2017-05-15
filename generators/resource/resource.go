@@ -25,7 +25,7 @@ func New(data makr.Data) (*makr.Generator, error) {
 
 	tmplName := "resource-use_model"
 
-	if mimeType == "json" || mimeType == "xml" {
+	if mimeType == "auto" || mimeType == "json" || mimeType == "xml" {
 		tmplName = "resource-json-xml"
 	} else if skipModel == true {
 		tmplName = "resource-name"
