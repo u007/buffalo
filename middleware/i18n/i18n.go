@@ -2,6 +2,7 @@ package i18n
 
 import (
 	"log"
+	"strings"
 
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/packr"
@@ -12,7 +13,7 @@ import (
 )
 
 // LanguageFinder can be implemented for custom finding of search
-// languages. This can be useful if you want to load a user's langugage
+// languages. This can be useful if you want to load a user's language
 // from something like a database. See Middleware() for more information
 // on how the default implementation searches for languages.
 type LanguageFinder func(*Translator, buffalo.Context) []string
@@ -21,7 +22,7 @@ type LanguageFinder func(*Translator, buffalo.Context) []string
 type Translator struct {
 	// Box - where are the files?
 	Box packr.Box
-	// DefaultLanguage - default is "en-US"
+	// DefaultLanguage - default is passed as a parameter on New.
 	DefaultLanguage string
 	// CookieName - name of the cookie to find the desired language.
 	// default is "lang"
@@ -71,6 +72,7 @@ func New(box packr.Box, language string) (*Translator, error) {
 // selected. By default languages are loaded in the following order:
 //
 // Cookie - "lang"
+// Session - "lang"
 // Header - "Accept-Language"
 // Default - "en-US"
 //
@@ -88,26 +90,52 @@ func (t *Translator) Middleware() buffalo.MiddlewareFunc {
 				}
 			}
 
+			// set languages in context, if not set yet
+			if langs := c.Value("languages"); langs == nil {
+				c.Set("languages", t.LanguageFinder(t, c))
+			}
+
+			// set translator
+			if T := c.Value("T"); T == nil {
+				langs := c.Value("languages").([]string)
+				T, err := i18n.Tfunc(langs[0], langs[1:]...)
+				if err != nil {
+					return err
+				}
+				c.Set("T", T)
+			}
+
 			// set up the helper function for the views:
-			c.Set(t.HelperName, func(s string) (string, error) {
-				return t.Translate(c, s)
+			c.Set(t.HelperName, func(s string, i ...interface{}) string {
+				return t.Translate(c, s, i...)
 			})
 			return next(c)
 		}
 	}
 }
 
-// Translate a string given a Context
-func (t *Translator) Translate(c buffalo.Context, s string) (string, error) {
-	if langs := c.Value("languages"); langs == nil {
-		c.Set("languages", t.LanguageFinder(t, c))
-	}
-	langs := c.Value("languages").([]string)
-	T, err := i18n.Tfunc(langs[0], langs[1:]...)
-	if err != nil {
-		return "", err
-	}
-	return T(s, c.Data()), nil
+// Translate returns the translation of the string identified by translationID.
+//
+// See https://github.com/nicksnyder/go-i18n
+//
+// If there is no translation for translationID, then the translationID itself is returned.
+// This makes it easy to identify missing translations in your app.
+//
+// If translationID is a non-plural form, then the first variadic argument may be a map[string]interface{}
+// or struct that contains template data.
+//
+// If translationID is a plural form, the function accepts two parameter signatures
+// 1. T(count int, data struct{})
+// The first variadic argument must be an integer type
+// (int, int8, int16, int32, int64) or a float formatted as a string (e.g. "123.45").
+// The second variadic argument may be a map[string]interface{} or struct{} that contains template data.
+// 2. T(data struct{})
+// data must be a struct{} or map[string]interface{} that contains a Count field and the template data,
+// Count field must be an integer type (int, int8, int16, int32, int64)
+// or a float formatted as a string (e.g. "123.45").
+func (t *Translator) Translate(c buffalo.Context, translationID string, args ...interface{}) string {
+	T := c.Value("T").(i18n.TranslateFunc)
+	return T(translationID, args...)
 }
 
 func defaultLanguageFinder(t *Translator, c buffalo.Context) []string {
@@ -130,10 +158,26 @@ func defaultLanguageFinder(t *Translator, c buffalo.Context) []string {
 	// try to get the language from a header:
 	acceptLang := r.Header.Get("Accept-Language")
 	if acceptLang != "" {
-		langs = append(langs, acceptLang)
+		langs = append(langs, parseAcceptLanguage(acceptLang)...)
 	}
 
-	// try to get the language from the session:
+	// finally set the default app language as fallback
 	langs = append(langs, t.DefaultLanguage)
 	return langs
+}
+
+// Inspired from https://siongui.github.io/2015/02/22/go-parse-accept-language/
+// Parse an Accept-Language string to get usable lang values for i18n system
+func parseAcceptLanguage(acptLang string) []string {
+	var lqs []string
+
+	langQStrs := strings.Split(acptLang, ",")
+	for _, langQStr := range langQStrs {
+		trimedLangQStr := strings.Trim(langQStr, " ")
+
+		langQ := strings.Split(trimedLangQStr, ";")
+		lq := langQ[0]
+		lqs = append(lqs, lq)
+	}
+	return lqs
 }

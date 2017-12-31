@@ -14,8 +14,8 @@ Please visit [http://gobuffalo.io](http://gobuffalo.io) for the latest documenta
 
 ## Installation
 
-```text
-$ go get -u github.com/gobuffalo/buffalo/buffalo
+```bash
+$ go get -u -v github.com/gobuffalo/buffalo/buffalo
 ```
 
 _NOTE_: Buffalo has a minimum Go dependency of `1.8.1`.
@@ -97,7 +97,7 @@ Buffalo would not be possible if not for all of the great projects it depends on
 
 ### Sessions, Cookies, Websockets, and more...
 
-[github.com/gorilla](https://github.com/gorilla) - The Gorilla toolkit is a great set of packages designed to improve upon the standard libary for a variety of web-related packages. With these high quality packages Buffalo is able to keep its "core" code to a minimum and focus on its goal of glueing them all together to make your life better.
+[github.com/gorilla](https://github.com/gorilla) - The Gorilla toolkit is a great set of packages designed to improve upon the standard library for a variety of web-related packages. With these high quality packages Buffalo is able to keep its "core" code to a minimum and focus on its goal of glueing them all together to make your life better.
 
 ## Benchmarks
 

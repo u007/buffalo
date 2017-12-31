@@ -5,10 +5,8 @@ import (
 	"crypto/subtle"
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/url"
-	"runtime"
 	"strings"
 
 	"github.com/gobuffalo/buffalo"
@@ -31,7 +29,7 @@ var (
 
 	// Idempotent (safe) methods as defined by RFC7231 section 4.2.2.
 	safeMethods = []string{"GET", "HEAD", "OPTIONS", "TRACE"}
-	htmlTypes   = []string{"html", "form", "plain"}
+	htmlTypes   = []string{"html", "form", "plain", "*/*"}
 )
 
 var (
@@ -48,22 +46,13 @@ var (
 	ErrBadToken = errors.New("CSRF token invalid")
 )
 
-// Middleware is deprecated, and will be removed in v0.10.0. Use csrf.New instead.
-var Middleware = func(next buffalo.Handler) buffalo.Handler {
-	warningMsg := "csrf.Middleware is deprecated, and will be removed in v0.10.0. Use csrf.New instead."
-	_, file, no, ok := runtime.Caller(1)
-	if ok {
-		warningMsg = fmt.Sprintf("%s Called from %s:%d", warningMsg, file, no)
-	}
-	return New(next)
-}
-
 // New enable CSRF protection on routes using this middleware.
 // This middleware is adapted from gorilla/csrf
 var New = func(next buffalo.Handler) buffalo.Handler {
 	return func(c buffalo.Context) error {
 		// don't run in test mode
 		if envy.Get("GO_ENV", "development") == "test" {
+			c.Set(tokenKey, "test")
 			return next(c)
 		}
 

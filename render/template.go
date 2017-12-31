@@ -1,11 +1,12 @@
 package render
 
 import (
-	"html"
 	"html/template"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -13,7 +14,6 @@ import (
 	// this blank import is here because dep doesn't
 	// handle transitive dependencies correctly
 	_ "github.com/russross/blackfriday"
-	"github.com/shurcooL/github_flavored_markdown"
 )
 
 type templateRenderer struct {
@@ -47,7 +47,46 @@ func (s templateRenderer) partial(name string, dd Data) (template.HTML, error) {
 }
 
 func (s templateRenderer) exec(name string, data Data) (template.HTML, error) {
-	source, err := s.TemplatesBox.MustBytes(name)
+	ct := strings.ToLower(s.contentType)
+	data["contentType"] = ct
+
+	if filepath.Ext(name) == "" {
+		switch {
+		case strings.Contains(ct, "html"):
+			name += ".html"
+		case strings.Contains(ct, "javascript"):
+			name += ".js"
+		case strings.Contains(ct, "markdown"):
+			name += ".md"
+		}
+	}
+
+	// Try to use localized version
+	templateName := name
+	if languages, ok := data["languages"].([]string); ok {
+		ll := len(languages)
+		if ll > 0 {
+			// Default language is the last in the list
+			defaultLanguage := languages[ll-1]
+			ext := filepath.Ext(name)
+			rawName := strings.TrimSuffix(name, ext)
+
+			for _, l := range languages {
+				var candidateName string
+				if l == defaultLanguage {
+					break
+				}
+				candidateName = rawName + "." + strings.ToLower(l) + ext
+				if s.TemplatesBox.Has(candidateName) {
+					// Replace name with the existing suffixed version
+					templateName = candidateName
+					break
+				}
+			}
+		}
+	}
+
+	source, err := s.TemplatesBox.MustBytes(templateName)
 	if err != nil {
 		return "", err
 	}
@@ -62,17 +101,37 @@ func (s templateRenderer) exec(name string, data Data) (template.HTML, error) {
 		helpers[k] = v
 	}
 
-	if strings.ToLower(filepath.Ext(name)) == ".md" && strings.ToLower(s.contentType) != "text/plain" {
-		source = github_flavored_markdown.Markdown(source)
-		source = []byte(html.UnescapeString(string(source)))
-	}
-
-	body, err := s.TemplateEngine(string(source), data, helpers)
-	if err != nil {
-		return "", err
+	body := string(source)
+	for _, ext := range s.exts(name) {
+		te, ok := s.TemplateEngines[ext]
+		if !ok {
+			log.Printf("could not find a template engine for %s\n", ext)
+			continue
+		}
+		body, err = te(body, data, helpers)
+		if err != nil {
+			return "", errors.Wrap(err, name)
+		}
 	}
 
 	return template.HTML(body), nil
+}
+
+func (s templateRenderer) exts(name string) []string {
+	exts := []string{}
+	for {
+		ext := filepath.Ext(name)
+		if ext == "" {
+			break
+		}
+		name = strings.TrimSuffix(name, ext)
+		exts = append(exts, strings.ToLower(ext[1:]))
+	}
+	if len(exts) == 0 {
+		return []string{"html"}
+	}
+	sort.Sort(sort.Reverse(sort.StringSlice(exts)))
+	return exts
 }
 
 func (s templateRenderer) assetPath(file string) (string, error) {

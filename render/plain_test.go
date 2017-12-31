@@ -4,17 +4,23 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/gobuffalo/buffalo/render"
-	"github.com/gobuffalo/plush"
+	"github.com/gobuffalo/packr"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_Plain(t *testing.T) {
 	r := require.New(t)
 
-	tmpFile, err := ioutil.TempFile("", "test")
+	tDir, err := ioutil.TempDir("", "templates")
+	if err != nil {
+		r.Fail("Could not set the templates dir")
+	}
+
+	tmpFile, err := os.Create(filepath.Join(tDir, "test"))
 	r.NoError(err)
 	defer os.Remove(tmpFile.Name())
 
@@ -24,10 +30,10 @@ func Test_Plain(t *testing.T) {
 	type ji func(...string) render.Renderer
 
 	j := render.New(render.Options{
-		TemplateEngine: plush.BuffaloRenderer,
+		TemplatesBox: packr.NewBox(tDir),
 	}).Plain
 
-	re := j(tmpFile.Name())
+	re := j(filepath.Base(tmpFile.Name()))
 	r.Equal("text/plain; charset=utf-8", re.ContentType())
 	var examples = []string{"Mark", "Jém"}
 	for _, example := range examples {

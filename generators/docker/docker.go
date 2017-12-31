@@ -8,21 +8,16 @@ import (
 	"github.com/pkg/errors"
 )
 
-// New Docker generator
-func New() (*makr.Generator, error) {
+// Run Docker generator
+func (d Generator) Run(root string, data makr.Data) error {
 	g := makr.New()
+	data["opts"] = d
 	g.Add(&makr.Func{
 		Should: func(data makr.Data) bool {
-			if data["docker"] == nil {
-				return true
-			}
-			return data["docker"].(string) != "none"
+			return d.Style != "none"
 		},
 		Runner: func(root string, data makr.Data) error {
-			if data["docker"] == nil {
-				data["docker"] = "multi"
-			}
-			style := data["docker"].(string)
+			style := d.Style
 			if style != "multi" && style != "standard" {
 				return errors.Errorf("unknown Docker style: %s", style)
 			}
@@ -37,5 +32,5 @@ func New() (*makr.Generator, error) {
 			return fg.Run(root, data)
 		},
 	})
-	return g, nil
+	return g.Run(root, data)
 }

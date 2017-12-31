@@ -17,6 +17,9 @@ import (
 // Options are used to configure and define how your application should run.
 type Options struct {
 	Name string
+	// Addr is the bind address provided to http.Server. Default is "127.0.0.1:3000"
+	// Can be set using ENV vars "ADDR" and "PORT".
+	Addr string
 	// Env is the "environment" in which the App is running. Default is "development".
 	Env string
 	// LogLevel defaults to "debug".
@@ -68,6 +71,11 @@ func optionsWithDefaults(opts Options) Options {
 	opts.Env = defaults.String(opts.Env, envy.Get("GO_ENV", "development"))
 	opts.LogLevel = defaults.String(opts.LogLevel, "debug")
 	opts.Name = defaults.String(opts.Name, "/")
+	addr := ""
+	if opts.Env == "development" {
+		addr = "127.0.0.1"
+	}
+	opts.Addr = defaults.String(opts.Addr, fmt.Sprintf("%s:%s", envy.Get("ADDR", addr), envy.Get("PORT", "3000")))
 
 	if opts.PreWares == nil {
 		opts.PreWares = []PreWare{}
