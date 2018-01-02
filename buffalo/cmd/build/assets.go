@@ -14,7 +14,7 @@ func (b *Builder) buildAssets() error {
 	var err error
 	if b.WithWebpack && b.Options.WithAssets {
 		envName := envy.Get("GO_ENV", "development")
-		fmt.Println("building", envName)
+		fmt.Println("webpack --config", envName)
 		envy.Set("NODE_ENV", envName)
 		if envName == "development" {
 			err = b.exec(webpack.BinPath)
