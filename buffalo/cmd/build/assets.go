@@ -1,6 +1,9 @@
 package build
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/gobuffalo/buffalo/generators/assets/webpack"
 	"github.com/gobuffalo/envy"
 	pack "github.com/gobuffalo/packr/builder"
@@ -8,10 +11,17 @@ import (
 )
 
 func (b *Builder) buildAssets() error {
-
+	var err error
 	if b.WithWebpack && b.Options.WithAssets {
-		envy.Set("NODE_ENV", "production")
-		err := b.exec(webpack.BinPath)
+		envName := envy.Get("GO_ENV", "development")
+		fmt.Println("compiling", envName)
+		envy.Set("NODE_ENV", envName)
+		if envName == "development" {
+			err = b.exec(webpack.BinPath)
+		} else {
+			err = b.exec(webpack.BinPath, "--config", "webpack."+strings.ToLower(envName)+".config.js")
+		}
+
 		if err != nil {
 			return errors.WithStack(err)
 		}
