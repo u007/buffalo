@@ -26,6 +26,7 @@ type Context interface {
 	LogField(string, interface{})
 	LogFields(map[string]interface{})
 	Logger() Logger
+	SetLogger(Logger)
 	Bind(interface{}) error
 	Render(int, render.Renderer) error
 	Error(int, error) error

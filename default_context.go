@@ -56,6 +56,11 @@ func (d *DefaultContext) Logger() Logger {
 	return d.logger
 }
 
+//setup new logging
+func (d *DefaultContext) SetLogger(logger Logger) {
+	d.logger = logger
+}
+
 // Param returns a param, either named or query string,
 // based on the key.
 func (d *DefaultContext) Param(key string) string {
