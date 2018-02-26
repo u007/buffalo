@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -56,7 +57,9 @@ func (a *App) Start(port string) error {
 func (a *App) Serve() error {
 	logrus.Infof("Starting application at %s", a.Options.Addr)
 	server := http.Server{
-		Handler: a,
+		Handler:      a,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 	ctx, cancel := sigtx.WithCancel(a.Context, syscall.SIGTERM, os.Interrupt)
 	defer cancel()
