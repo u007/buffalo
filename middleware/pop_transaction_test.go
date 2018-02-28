@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gobuffalo/buffalo"
-	"github.com/markbates/pop"
+	"github.com/gobuffalo/pop"
 	"github.com/markbates/willie"
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
@@ -88,7 +88,7 @@ func Test_PopTransaction(t *testing.T) {
 		res := w.HTML("/success").Get()
 		r.Equal(201, res.Code)
 		count, err := db.Count("widgets")
-		r.NoError(err)
+		r.NoError(err, err.Error())
 		r.Equal(1, count)
 	})
 	r.NoError(err)
