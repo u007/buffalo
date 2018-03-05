@@ -35,6 +35,14 @@ type DefaultContext struct {
 	flash       *Flash
 }
 
+func BareContext() DefaultContext {
+	return DefaultContext{
+		Context: context.Background(),
+		logger:  NewLogger("debug"),
+		data:    make(map[string]interface{}),
+	}
+}
+
 // Response returns the original Response for the request.
 func (d *DefaultContext) Response() http.ResponseWriter {
 	return d.response
