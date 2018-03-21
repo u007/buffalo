@@ -152,55 +152,55 @@ Thank you to the following **GIANTS**:
 
 * [github.com/mattn/anko/ast](https://github.com/mattn/anko/ast)
 
-* [github.com/mattn/anko/builtins](https://github.com/mattn/anko/builtins)
+* [github.com/mattn/anko/core](https://github.com/mattn/anko/core)
 
-* [github.com/mattn/anko/builtins/encoding/json](https://github.com/mattn/anko/builtins/encoding/json)
+* [github.com/mattn/anko/core/encoding/json](https://github.com/mattn/anko/core/encoding/json)
 
-* [github.com/mattn/anko/builtins/errors](https://github.com/mattn/anko/builtins/errors)
+* [github.com/mattn/anko/core/errors](https://github.com/mattn/anko/core/errors)
 
-* [github.com/mattn/anko/builtins/flag](https://github.com/mattn/anko/builtins/flag)
+* [github.com/mattn/anko/core/flag](https://github.com/mattn/anko/core/flag)
 
-* [github.com/mattn/anko/builtins/fmt](https://github.com/mattn/anko/builtins/fmt)
+* [github.com/mattn/anko/core/fmt](https://github.com/mattn/anko/core/fmt)
 
-* [github.com/mattn/anko/builtins/github.com/daviddengcn/go-colortext](https://github.com/mattn/anko/builtins/github.com/daviddengcn/go-colortext)
+* [github.com/mattn/anko/core/github.com/daviddengcn/go-colortext](https://github.com/mattn/anko/core/github.com/daviddengcn/go-colortext)
 
-* [github.com/mattn/anko/builtins/io](https://github.com/mattn/anko/builtins/io)
+* [github.com/mattn/anko/core/io](https://github.com/mattn/anko/core/io)
 
-* [github.com/mattn/anko/builtins/io/ioutil](https://github.com/mattn/anko/builtins/io/ioutil)
+* [github.com/mattn/anko/core/io/ioutil](https://github.com/mattn/anko/core/io/ioutil)
 
-* [github.com/mattn/anko/builtins/math](https://github.com/mattn/anko/builtins/math)
+* [github.com/mattn/anko/core/math](https://github.com/mattn/anko/core/math)
 
-* [github.com/mattn/anko/builtins/math/big](https://github.com/mattn/anko/builtins/math/big)
+* [github.com/mattn/anko/core/math/big](https://github.com/mattn/anko/core/math/big)
 
-* [github.com/mattn/anko/builtins/math/rand](https://github.com/mattn/anko/builtins/math/rand)
+* [github.com/mattn/anko/core/math/rand](https://github.com/mattn/anko/core/math/rand)
 
-* [github.com/mattn/anko/builtins/net](https://github.com/mattn/anko/builtins/net)
+* [github.com/mattn/anko/core/net](https://github.com/mattn/anko/core/net)
 
-* [github.com/mattn/anko/builtins/net/http](https://github.com/mattn/anko/builtins/net/http)
+* [github.com/mattn/anko/core/net/http](https://github.com/mattn/anko/core/net/http)
 
-* [github.com/mattn/anko/builtins/net/url](https://github.com/mattn/anko/builtins/net/url)
+* [github.com/mattn/anko/core/net/url](https://github.com/mattn/anko/core/net/url)
 
-* [github.com/mattn/anko/builtins/os](https://github.com/mattn/anko/builtins/os)
+* [github.com/mattn/anko/core/os](https://github.com/mattn/anko/core/os)
 
-* [github.com/mattn/anko/builtins/os/exec](https://github.com/mattn/anko/builtins/os/exec)
+* [github.com/mattn/anko/core/os/exec](https://github.com/mattn/anko/core/os/exec)
 
-* [github.com/mattn/anko/builtins/os/signal](https://github.com/mattn/anko/builtins/os/signal)
+* [github.com/mattn/anko/core/os/signal](https://github.com/mattn/anko/core/os/signal)
 
-* [github.com/mattn/anko/builtins/path](https://github.com/mattn/anko/builtins/path)
+* [github.com/mattn/anko/core/path](https://github.com/mattn/anko/core/path)
 
-* [github.com/mattn/anko/builtins/path/filepath](https://github.com/mattn/anko/builtins/path/filepath)
+* [github.com/mattn/anko/core/path/filepath](https://github.com/mattn/anko/core/path/filepath)
 
-* [github.com/mattn/anko/builtins/regexp](https://github.com/mattn/anko/builtins/regexp)
+* [github.com/mattn/anko/core/regexp](https://github.com/mattn/anko/core/regexp)
 
-* [github.com/mattn/anko/builtins/runtime](https://github.com/mattn/anko/builtins/runtime)
+* [github.com/mattn/anko/core/runtime](https://github.com/mattn/anko/core/runtime)
 
-* [github.com/mattn/anko/builtins/sort](https://github.com/mattn/anko/builtins/sort)
+* [github.com/mattn/anko/core/sort](https://github.com/mattn/anko/core/sort)
 
-* [github.com/mattn/anko/builtins/strconv](https://github.com/mattn/anko/builtins/strconv)
+* [github.com/mattn/anko/core/strconv](https://github.com/mattn/anko/core/strconv)
 
-* [github.com/mattn/anko/builtins/strings](https://github.com/mattn/anko/builtins/strings)
+* [github.com/mattn/anko/core/strings](https://github.com/mattn/anko/core/strings)
 
-* [github.com/mattn/anko/builtins/time](https://github.com/mattn/anko/builtins/time)
+* [github.com/mattn/anko/core/time](https://github.com/mattn/anko/core/time)
 
 * [github.com/mattn/anko/parser](https://github.com/mattn/anko/parser)
 
