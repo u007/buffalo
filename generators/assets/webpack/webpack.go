@@ -18,7 +18,7 @@ var logo = &makr.RemoteFile{
 }
 
 // BinPath is the path to the local install of webpack
-var BinPath = filepath.Join("node_modules", ".bin", "webpack.js")
+var BinPath = filepath.Join("node_modules", ".bin", "webpack")
 
 // Run webpack generator
 func (w Generator) Run(root string, data makr.Data) error {
