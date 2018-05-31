@@ -13,6 +13,9 @@ import (
 func (b *Builder) buildAssets() error {
 	var err error
 	if b.WithWebpack && b.Options.WithAssets {
+		if err := envy.MustSet("NODE_ENV", "production"); err != nil {
+			return errors.WithStack(err)
+		}
 		envName := envy.Get("GO_ENV", "development")
 		fmt.Println("webpack --config", envName)
 		envy.Set("NODE_ENV", envName)
